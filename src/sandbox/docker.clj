@@ -9,7 +9,7 @@
             [cheshire.core :as cheshire]))
 
 (def config {:expose-port 8080
-             :docker-url "http://127.0.0.1:9999"})
+             :docker-url "http://127.0.0.1:9999/"})
 
 (def workers (ref {}))
 
