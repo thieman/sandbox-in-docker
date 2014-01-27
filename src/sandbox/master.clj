@@ -7,7 +7,7 @@
             [sandbox.docker :as docker]
             [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.json]
+            [ring.middleware.json :refer :all]
             [org.httpkit.server :refer :all]))
 
 (defn message-handler [req]
