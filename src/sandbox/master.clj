@@ -13,19 +13,22 @@
 (defn message-handler [req]
   (info req)
   (with-channel req req-channel
-    (go (let [code (get-in req [:params :code])]
-          (when code
+    (go (let [code (get-in req [:body :code])]
+          (if code
             (let [result-channel (docker/eval-on-worker code)
                   result (<! result-channel)
                   reply (str code "\n" "=> " result)]
-              (send! req-channel reply)))))))
+              (send! req-channel {:status 200
+                                  :headers {"Content-Type" "application/json"}
+                                  :body reply}))
+            (send! req-channel {:status 400}))))))
 
 (defroutes app-routes
   (POST "/clojure" [] message-handler))
 
 (def app (-> app-routes
              (wrap-json-response)
-             (wrap-json-params)))
+             (wrap-json-body)))
 
 (defn -main []
   (docker/build-container!)
