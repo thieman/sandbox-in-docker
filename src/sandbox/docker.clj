@@ -106,16 +106,15 @@
   channel onto which the result will be posted."
   [form]
   (let [result-channel (chan)]
-    (go-loop [form form]
-             (let [worker-doc (acquire-worker-doc!)]
-               (if-not worker-doc
-                 (do (<! (timeout 500))
-                     (recur form))
-                 (do (>! (:in worker-doc) form)
-                     (let [[response channel] (alts! [(:out worker-doc) (timeout 10000)])]
-                       (if (nil? response)
-                         (do (replace-worker! worker-doc)
-                             (>! result-channel (str "Evaluation timed out")))
-                         (do (unlock-worker! worker-doc)
-                             (>! result-channel (String. response)))))))))
+    (go (let [worker-doc (acquire-worker-doc!)]
+          (if-not worker-doc
+            (do (<! (timeout 500))
+                (recur form))
+            (do (>! (:in worker-doc) form)
+                (let [[response channel] (alts! [(:out worker-doc) (timeout 10000)])]
+                  (if (nil? response)
+                    (do (replace-worker! worker-doc)
+                        (>! result-channel (str "Evaluation timed out")))
+                    (do (unlock-worker! worker-doc)
+                        (>! result-channel (String. response)))))))))
     result-channel))

@@ -12,17 +12,12 @@
 
 (defn process-message [message]
   (info message)
-  (when (and (= "message" (:type message))
-             (not= (get-in message [:message :sender_email])
-                   (get-in conn [:opts :username])))
-    (let [content (get-in message [:message :content])
-          forms (extract-forms content)
-          allowed-forms (filter (partial allowed-form? content) forms)]
-      (when (seq allowed-forms)
-        (go (let [result-channel (docker/eval-on-worker (first allowed-forms))
-                  result (<! result-channel)
-                  reply (str (first allowed-forms) "\n" "=> " result)]
-              (respond message reply)))))))
+  (let [code (:code message)]
+    (when code
+      (go (let [result-channel (docker/eval-on-worker code)]
+                result (<! result-channel)
+                reply (str code "\n" "=> " result)]
+            (respond message reply)))))
 
 (defroutes app-routes
   (POST "/clojure" {params :params} (process-message)))
