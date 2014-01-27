@@ -8,19 +8,20 @@
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.json]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [org.httpkit.server :refer :all]))
 
-(defn process-message [message]
+(defn message-handler [req]
   (info message)
-  (let [code (:code message)]
-    (when code
-      (go (let [result-channel (docker/eval-on-worker code)]
-                result (<! result-channel)
-                reply (str code "\n" "=> " result)]
-            (respond message reply)))))
+  (with-channel req req-channel
+    (go (let [code (get-in req [:params :code])]
+          (when code
+            (let [result-channel (docker/eval-on-worker code)
+                  result (<! result-channel)
+                  reply (str code "\n" "=> " result)]
+              (send! req-channel reply)))))))
 
 (defroutes app-routes
-  (POST "/clojure" {params :params} (process-message)))
+  (POST "/clojure" [] message-handler))
 
 (def app (-> app-routes
              (wrap-json-response)
@@ -29,4 +30,4 @@
 (defn -main []
   (docker/build-container!)
   (docker/add-worker!)
-  (run-jetty (app) {:port 8080 :join? false}))
+  (run-server app {:port 8080}))
