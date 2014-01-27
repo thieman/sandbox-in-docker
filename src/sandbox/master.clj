@@ -11,7 +11,7 @@
             [org.httpkit.server :refer :all]))
 
 (defn message-handler [req]
-  (info message)
+  (info req)
   (with-channel req req-channel
     (go (let [code (get-in req [:params :code])]
           (when code
