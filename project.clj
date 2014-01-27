@@ -10,6 +10,7 @@
                  [clj-http "0.7.8"]
                  [cheshire "5.2.0"]
                  [compojure "1.1.5"]
+                 [ring "1.2.1"]
                  [ring/ring-json "0.2.0"]]
   :profiles {:master {:main sandbox.master}
              :worker {:main sandbox.worker}})

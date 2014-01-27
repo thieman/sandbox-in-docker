@@ -3,7 +3,7 @@
 FROM thieman/clojure
 MAINTAINER Travis Thieman, travis.thieman@gmail.com
 
-RUN git clone https://github.com/thieman/sandbox-in-docker.git
+RUN git clone https://github.com/thieman/sandbox-in-docker.git sandbox
 WORKDIR /sandbox
 
 # ZMQ

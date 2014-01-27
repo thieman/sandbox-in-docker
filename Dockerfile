@@ -5,7 +5,7 @@ MAINTAINER Travis Thieman, travis.thieman@gmail.com
 ENV PORT 9999
 ENV LEIN_ROOT 1
 
-RUN git clone https://github.com/thieman/sandbox-in-docker.git
+RUN git clone https://github.com/thieman/sandbox-in-docker.git sandbox
 WORKDIR /sandbox
 RUN cd /sandbox; lein deps
 
@@ -27,9 +27,6 @@ VOLUME /var/lib/docker
 
 # child container rootfs app armor workaround
 ADD resources/public/lxc-default /etc/apparmor.d/lxc/lxc-default
-
-# copy over private config
-ADD resources/private /sandbox/resources/private
 
 # run sandbox if no other arguments given to docker run
 CMD wrapdocker
