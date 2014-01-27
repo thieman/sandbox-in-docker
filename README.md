@@ -21,7 +21,7 @@ The sandbox executes any Clojure code you throw at it with no restrictions at al
 
 ## TODO and/or Glaring Flaws
 
-This project is a proof-of-concept and has some serious flaws. Here's just a few:
+This project is a proof of concept and has some serious flaws. Here's just a few:
 
 * Currently, there is actually only one exec process in the pool.
 * All users are talking to the same underlying Clojure environment, meaning they can mess with each other's namespaces. This also means that the entire environment is lost if some smartass runs `(system/exit 0)`.

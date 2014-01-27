@@ -1,4 +1,4 @@
-(ns lazubot.docker
+(ns sandbox.docker
   (:require [clojure.string :as string]
             [clojure.java.io :as io]
             [clojure.tools.logging :refer [debug info warn]]
@@ -6,11 +6,10 @@
             [clojure.core.async :refer [go go-loop chan sliding-buffer <! >! timeout alts!]]
             [com.keminglabs.zmq-async.core :refer [register-socket!]]
             [clj-http.client :as client]
-            [cheshire.core :as cheshire])
-  (:import [java.io PushbackReader]))
+            [cheshire.core :as cheshire]))
 
-(def config (with-open [r (io/reader (io/resource "private/config"))]
-              (read (PushbackReader. r))))
+(def config {:expose-port 8080
+             :docker-url "http://127.0.0.1:9999"})
 
 (def workers (ref {}))
 
@@ -21,13 +20,13 @@
   "Build the worker image. Should only need to do this once unless you
   want to do a fresh pull of the repository."
   []
-  (info "Building lazubot-worker container")
-  (shell/sh "docker" "build" "-no-cache=true" "-t=lazubot-worker" "resources/public"))
+  (info "Building sandbox-worker container")
+  (shell/sh "docker" "build" "-no-cache=true" "-t=sandbox-worker" "resources/public"))
 
 (defn run-new-container!
   "Start a new worker container and return its ID."
   []
-  (let [container-id (-> (shell/sh "docker" "run" "-d=true" "-expose=8080" "lazubot-worker")
+  (let [container-id (-> (shell/sh "docker" "run" "-d=true" "-expose=8080" "sandbox-worker")
                          (:out)
                          (string/trim-newline))]
     (info "Started container " container-id)
@@ -67,7 +66,7 @@
       (unlock-worker! worker-doc)))
 
 (defn add-worker! []
-  "Start a new lazubot-worker container and add its worker-doc to the
+  "Start a new sandbox-worker container and add its worker-doc to the
   workers ref."
   (let [container-id (run-new-container!)
         container-address (container-address container-id)

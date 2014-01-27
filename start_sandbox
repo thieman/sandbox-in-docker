@@ -1,2 +1,2 @@
 docker build -no-cache=true -t=sandbox .
-docker run -privileged=true -lxc-conf="lxc.aa_profile=unconfined" -name=sandbox-master -t=true -i=true sandbox
+docker run -privileged=true -p 127.0.0.1:8080:8080 -lxc-conf="lxc.aa_profile=unconfined" -name=sandbox-master -t=true -i=true sandbox

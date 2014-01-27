@@ -1,4 +1,4 @@
-(ns lazubot.worker
+(ns sandbox.worker
   (:require [clojure.tools.logging :refer [debug info warn]]
             [clojure.core.async :refer [>!! <!! chan sliding-buffer]]
             [com.keminglabs.zmq-async.core :refer [register-socket!]]
